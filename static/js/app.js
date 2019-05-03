@@ -18,7 +18,7 @@ function buildMetadata(sample) {
 function buildCharts(sample) {
     console.log("Current > "+sample);
     // @TODO: Use `d3.json` to fetch the sample data for the plots
-    d3.json(sample(sample)).then(function(data) {
+    d3.json("/samples/"+sample).then(function(data) {
         console.log(data);
     });
     // @TODO: Build a Bubble Chart using the sample data
