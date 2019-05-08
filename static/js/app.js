@@ -1,31 +1,56 @@
 function buildMetadata(sample) {
 
   // @TODO: Complete the following function that builds the metadata panel
-
-  // Use `d3.json` to fetch the metadata for a sample
-    // Use d3 to select the panel with id of `#sample-metadata`
-
-    // Use `.html("") to clear any existing metadata
-
-    // Use `Object.entries` to add each key and value pair to the panel
-    // Hint: Inside the loop, you will need to use d3 to append new
-    // tags for each key-value in the metadata.
-
+  d3.json('/metadata/'+sample).then(function(response) {
+    console.log();
+      d3.select('#sample-metadata').html("");
+      Object.entries(response).forEach(([key, value]) => {
+        d3.select('#sample-metadata').append('p').text(`${key}: ${value}`);
+    });
+  });
     // BONUS: Build the Gauge Chart
     // buildGauge(data.WFREQ);
 }
 
 function buildCharts(sample) {
-    console.log("Current > "+sample);
-    // @TODO: Use `d3.json` to fetch the sample data for the plots
-    d3.json("/samples/"+sample).then(function(data) {
-        console.log(data);
-    });
-    // @TODO: Build a Bubble Chart using the sample data
+    d3.json('/samples/'+sample).then(function(response) {
+    var bubTrace = {
+      x: response.otu_ids,
+      y: response.sample_values,
+      mode: 'markers',
+      marker: {
+        color:response.otu_ids,
+        size:response.sample_values
+      },
+      text: response.otu_labels,
+    };
+    var bubData = [bubTrace];
+    var bubLayout = {
+      title: 'Belly Button Biodiversity',
+      showlegend: false,
+    };
+    Plotly.newPlot("bubble", bubData, bubLayout);
+    var slcVals = response.sample_values.slice(0, 10);
+    var slcIDs = response.otu_ids.slice(0, 10);
+    var slcLabels = response.otu_labels.slice(0, 10);
+    slcVals.sort(function compareFunction(firstNum, secondNum) {
+      return secondNum - firstNum;});
+    slcIDs.sort(function compareFunction(firstNum, secondNum) {
+      return secondNum - firstNum;});
+    slcLabels.sort(function compareFunction(firstNum, secondNum) {
+      return secondNum - firstNum;});                 
+    var pieTrace = {
+      labels: slcIDs,
+      values: slcVals,
+      textinfo: slcLabels,
+      type: "pie"}
+    var pieData = [pieTrace];
+    var pieLayout = {
+    title: "Belly Button Biodiversity Pie Chart",
+    };
+    Plotly.newPlot("pie", pieData, pieLayout);
 
-    // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
+});
 }
 
 function init() {
